@@ -26,10 +26,25 @@ namespace HTMLViewer_Extended
 
         private void HtmlEditControl1_CancellableUserInteraction(object sender, Zoople.CancellableUserInteractionEventsArgs e)
         {
-            if (htmlEditControl1.EditingDisabled && e.Keys.Keycode == (int)Keys.C && e.Keys.Control)
+            if (htmlEditControl1.EditingDisabled)
             {
-                if (htmlEditControl1.CurrentSelection.htmlText != null)
-                    this.htmlEditControl1.copy_document();
+                if (e.InteractionType == Zoople.EditorUIEvents.onkeydown)
+                {
+                    if (e.Keys.Keycode == (int)Keys.C && e.Keys.Control)
+                    {
+                        if (htmlEditControl1.CurrentSelection.htmlText != null)
+                            this.htmlEditControl1.copy_document();
+                    }
+                }
+                else
+                {
+                    if (e.InteractionType == Zoople.EditorUIEvents.onmouseup)
+                    {
+                        var oEle = htmlEditControl1.FindParentElementOfType("a");
+                        if (oEle.TagName.ToLower() == "a")
+                            MessageBox.Show("Link Clicked: " + oEle.GetAttribute("href"));
+                    }
+                }
             }
         }
 
