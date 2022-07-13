@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace HTMLViewer_Extended
 {
     public partial class Form1 : Form
@@ -9,7 +11,7 @@ namespace HTMLViewer_Extended
             InitializeComponent();
 
             this.htmlEditControl1.CSSText = "body {font-family: Arial}";
-            this.htmlEditControl1.DocumentHTML = "<p>paragraph 1</p><p>paragraph 2</p><p>paragraph 3</p><p>paragraph 4</p>";
+            this.htmlEditControl1.DocumentHTML = "<p>paragraph 1</p><p>paragraph 2</p><p>paragraph 3</p><p>paragraph 4</p><p><a href=\"https://www.google.com\">link to Google</a></p>";
 
             this.htmlEditControl1.MouseDown += HtmlEditControl1_MouseDown;
             this.htmlEditControl1.CancellableUserInteraction += HtmlEditControl1_CancellableUserInteraction;
@@ -48,7 +50,14 @@ namespace HTMLViewer_Extended
                     {
                         var oEle = htmlEditControl1.FindParentElementOfType("a");
                         if (oEle != null)
-                            MessageBox.Show("Link Clicked (handle click event here): " + oEle.GetAttribute("href"));
+                        {
+                            var psi = new System.Diagnostics.ProcessStartInfo
+                            {
+                                UseShellExecute = true,
+                                FileName = oEle.GetAttribute("href")
+                            }; 
+                            Process.Start(psi);
+                        }
                     }
                     else
                     {
