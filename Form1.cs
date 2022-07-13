@@ -22,6 +22,12 @@ namespace HTMLViewer_Extended
             oContext = new ContextMenuStrip();
 
             oContext.Items.Add("Copy").Click += CopyContextItem_Click;
+            oContext.Items.Add("Select All").Click += SelectAllContent_Click;
+        }
+
+        private void SelectAllContent_Click(object? sender, EventArgs e)
+        {
+            this.htmlEditControl1.Document.ExecCommand("SelectAll", false, null);
         }
 
         private void HtmlEditControl1_CancellableUserInteraction(object sender, Zoople.CancellableUserInteractionEventsArgs e)
@@ -41,8 +47,17 @@ namespace HTMLViewer_Extended
                     if (e.InteractionType == Zoople.EditorUIEvents.onmouseup)
                     {
                         var oEle = htmlEditControl1.FindParentElementOfType("a");
-                        if (oEle.TagName.ToLower() == "a")
-                            MessageBox.Show("Link Clicked: " + oEle.GetAttribute("href"));
+                        if (oEle != null)
+                            MessageBox.Show("Link Clicked (handle click event here): " + oEle.GetAttribute("href"));
+                    }
+                    else
+                    {
+                        if (e.InteractionType == Zoople.EditorUIEvents.onmousedown)
+                        {
+                            var oEle = htmlEditControl1.FindParentElementOfType("table");
+                            if (oEle != null)
+                                e.Cancel = true;
+                        }
                     }
                 }
             }
@@ -52,8 +67,8 @@ namespace HTMLViewer_Extended
         {
             if (htmlEditControl1.EditingDisabled && ((int)e.Button) == 2)
             {
-                if (htmlEditControl1.CurrentSelection.htmlText != null)
-                    oContext.Show(PointToScreen(e.Location));
+                oContext.Items[0].Enabled = this.htmlEditControl1.CurrentSelection.htmlText !=  null;
+                oContext.Show(PointToScreen(e.Location));
             }
         }
 
@@ -67,6 +82,9 @@ namespace HTMLViewer_Extended
             this.htmlEditControl1.EditingDisabled = false;
             this.htmlEditControl1.HideDOMToolbar = false;
             this.htmlEditControl1.HideMainToolbar = false;
+
+            this.htmlEditControl1.CSSText = "body {font-family: Arial}";
+
         }
 
         private void ViewerMode_Click(object? sender, EventArgs e)
@@ -74,6 +92,8 @@ namespace HTMLViewer_Extended
             this.htmlEditControl1.EditingDisabled = true;
             this.htmlEditControl1.HideDOMToolbar = true;
             this.htmlEditControl1.HideMainToolbar = true;
+
+            this.htmlEditControl1.CSSText = "body {font-family: Arial} table {border: none !important} td, th, tr {border: none !important}";
         }
     }
 }
